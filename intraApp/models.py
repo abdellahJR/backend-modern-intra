@@ -5,6 +5,7 @@ from django.db import models
 
 class Company(models.Model):
     name = models.CharField(max_length=200)
+    user_id = models.ForeignKey(CustomUse, on_delete=models.CASCADE, null=true)
 
     def __str__(self):
         return self.name
@@ -13,29 +14,31 @@ class Company(models.Model):
 class CustomUse(models.Model):
     name = models.CharField(max_length=200)
     email = models.EmailField()
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
-        return self.email
+        return self.name
 
 
 
 class Booking(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='bookingsCollection')
-    title = models.CharField(max_length=300)
+    company_id = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='bookingsCollection')
     start_date = models.DateField()
     end_date = models.DateField()
-    price = models.FloatField()
-    hours = models.IntegerField()
 
     def __str__(self):
-        return self.title
+        return self.company
 
 
 
 class Account(models.Model):
     name = models.CharField(max_length=200)
-    company_ID = models.OneToOneField(Company, on_delete=models.CASCADE)
+    company_id = models.OneToOneField(Company, on_delete=models.CASCADE)
+
+    def get_company_customer(self):
+        return self.company_id.user_id
+
+    def get_company_partner(self):
+        return self.company_id
 
     def __str__(self):
         return self.name

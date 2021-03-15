@@ -11,7 +11,7 @@ class SecondaryEmails(models.Model):
         return self.email
 
 
-class CustomUse(models.Model):
+class CustomUser(models.Model):
 
     USER_TYPE = [
         ('client', 'client'),
@@ -21,7 +21,7 @@ class CustomUse(models.Model):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=25)
     last_name = models.CharField(max_length=25)
-    user_type = models.CharField(choices=USER_TYPE, max_length=8)
+    user_type = models.CharField(choices=USER_TYPE, max_length=8, blank=True, null=True)
     secondaryEmails = models.ManyToManyField(SecondaryEmails, blank=True)
     hourlyRate = models.PositiveIntegerField(blank=True, null=True)
 
@@ -36,7 +36,7 @@ class CustomUse(models.Model):
 
 class Company(models.Model):
     name = models.CharField(max_length=200, unique=True)
-    user_id = models.ForeignKey(CustomUse, on_delete=models.CASCADE, blank=True, null=True)
+    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return self.name

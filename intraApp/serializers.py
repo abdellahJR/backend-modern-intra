@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from .models import CustomUse, Company, SecondaryEmails
+from .models import CustomUser, Company, SecondaryEmails
 
 
 class SecondaryEmailsSerializer(serializers.ModelSerializer):
@@ -9,19 +9,15 @@ class SecondaryEmailsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
-
-
-class CustomUseSerializer(serializers.ModelSerializer):
-    secondaryEmails = SecondaryEmailsSerializer(many=True)
-
+class CustomUserSerializer(serializers.ModelSerializer):
+    secondaryEmails = serializers.StringRelatedField(many=True)
     class Meta:
-        model = CustomUse
+        model = CustomUser
         fields = '__all__'
 
 
 class CompanySerializer(serializers.ModelSerializer):
-    user_id = CustomUseSerializer()
+    user_id = CustomUserSerializer(many=True)
     class Meta:
         model = Company
         fields ='__all__'

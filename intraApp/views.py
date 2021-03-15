@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from .serializers import CustomUseSerializer, SecondaryEmailsSerializer, CompanySerializer
-from .models import CustomUse, Company
+from .serializers import CustomUserSerializer, SecondaryEmailsSerializer, CompanySerializer
+from .models import CustomUser, Company
 # Create your views here.
 
 
@@ -17,14 +17,14 @@ from .models import CustomUse, Company
 
 
 
-class CustomUseListAPIView(ListCreateAPIView):
-    serializer_class = CustomUseSerializer
-    queryset = CustomUse.objects.all()
+class CustomUserListAPIView(ListCreateAPIView):
+    serializer_class = CustomUserSerializer
+    queryset = CustomUser.objects.all()
 
 
-class CustomUseDetailAPIView(RetrieveUpdateDestroyAPIView):
-    serializer_class = CustomUseSerializer
-    queryset = CustomUse.objects.all()
+class CustomUserDetailAPIView(RetrieveUpdateDestroyAPIView):
+    serializer_class = CustomUserSerializer
+    queryset = CustomUser.objects.all()
     lookup_field = "id"
 
 

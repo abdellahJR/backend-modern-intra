@@ -54,7 +54,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=225, unique=True, db_index=True)
     first_name = models.CharField(max_length=25, blank=True)
     last_name = models.CharField(max_length=25, blank=True)
-    user_type = models.CharField(choices=USER_TYPE, max_length=8, blank=True, null=True)
+    user_type = models.CharField(choices=USER_TYPE, default='client', max_length=8, blank=True, null=True)
     secondaryEmails = models.ManyToManyField(SecondaryEmails, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

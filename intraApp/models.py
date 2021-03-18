@@ -1,8 +1,8 @@
 from django.db import models
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 # Create your models here.
-
-
 
 class SecondaryEmails(models.Model):
     email = models.EmailField(blank=True, null=True, unique=True)
@@ -11,32 +11,76 @@ class SecondaryEmails(models.Model):
         return self.email
 
 
-class CustomUser(models.Model):
+class UserManager(BaseUserManager):
+
+    def create_user(self, email, password, **other_fields):
+
+        if email is None:
+            raise TypeError('Users should have a email')
+
+        user = self.model(email=self.normalize_email(
+            email), **other_fields)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def create_superuser(self, email, password, **other_fields):
+        other_fields.setdefault('is_staff', True)
+        other_fields.setdefault('is_superuser', True)
+        other_fields.setdefault('is_active', True)
+
+        if other_fields.get('is_staff') is not True:
+            raise ValueError(
+                'Superuser must be assigned to is_staff=True.')
+        if other_fields.get('is_superuser') is not True:
+            raise ValueError(
+                'Superuser must be assigned to is_superuser=True.')
+
+        if password is None:
+            raise TypeError('Password should not be none')
+
+        user = self.create_user(email, password, **other_fields)
+        user.save()
+        return user
+
+
+class User(AbstractBaseUser, PermissionsMixin):
 
     USER_TYPE = [
         ('client', 'client'),
         ('employee', 'employee'),
     ]
 
-    email = models.EmailField(unique=True)
-    first_name = models.CharField(max_length=25)
-    last_name = models.CharField(max_length=25)
+    email = models.EmailField(max_length=225, unique=True, db_index=True)
+    first_name = models.CharField(max_length=25, blank=True)
+    last_name = models.CharField(max_length=25, blank=True)
     user_type = models.CharField(choices=USER_TYPE, max_length=8, blank=True, null=True)
     secondaryEmails = models.ManyToManyField(SecondaryEmails, blank=True)
-    hourlyRate = models.PositiveIntegerField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-    @property
-    def is_client(self):
-        if self.user_type == 'client':
-            return True
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+    objects = UserManager()
 
     def __str__(self):
-        return self.first_name
+        return self.email
+
+    def tokens(self):
+        refresh = RefreshToken.for_user(self)
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token)
+        }
+
+
 
 
 class Company(models.Model):
     name = models.CharField(max_length=200, unique=True)
-    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True, null=True)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return self.name

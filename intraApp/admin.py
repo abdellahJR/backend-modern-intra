@@ -5,7 +5,7 @@ from .models import *
 
 
 admin.site.register(Company)
-admin.site.register(CustomUser)
+admin.site.register(User)
 admin.site.register(Account)
 admin.site.register(SecondaryEmails)
 admin.site.register(Booking)
